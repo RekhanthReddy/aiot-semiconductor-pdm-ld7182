@@ -216,7 +216,6 @@ reasons:
   ensures the project remains open-source and flexible across the widest
   possible range of tools and research projects.
 
-
 **##**** Susto et al. (2015)** **Full citation: **
 
  Susto, G.A., Schirru, A., Pampuri, S.,
@@ -251,6 +250,11 @@ from "normal production" significantly outnumber observations from
 "abnormal or faulty production"** . This happens because machines
 ideally spend most of their time working correctly, leading to very few data
 points representing actual failures
+
+**-** Equipment they tested on:
+Ion implantation process in semiconductor manufacturing — specifically,
+tungsten filament wear/failure prediction. NOT the SECOM dataset (a
+common misattribution in secondary sources).
 
 From a machine learning perspective, this skewness is problematic because it generally
 results in  **poor prediction accuracy and poor generalization performance** .
