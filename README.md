@@ -2,7 +2,6 @@
 
 AIoT Predictive Maintenance for Semiconductor Test Equipment — LD7182
 
-
 **#** AIoT Predictive Maintenance for Semiconductor Test Equipment
 
 ******Module:****** LD7182 AI for IoT
@@ -36,5 +35,16 @@ monitoring via Blynk.
 **-**`/dataset` — SECOM data and preprocessing
 **-**`/references` — BibTeX references
 
-**##** Progress Log
-**-** 23 Apr 2026: Repository initialized
+
+## Project Resources
+
+- **Wokwi Simulation:** https://wokwi.com/projects/462262259358425089
+- **GitHub Repository:** https://github.com/RekhanthReddy/aiot-semiconductor-pdm-ld7182
+- **Status:** Week 1 — Wokwi circuit complete, SECOM exploration in progress
+
+## Progress Log
+
+- 23 Apr: Repo setup + Papers 1-2 (Gupta, Ooko)
+- 24 Apr: Papers 3-4 (Njor, Hymel)
+- 25 Apr: Papers 5-7 (Susto, Achouch, Prakash) + Wokwi circuit complete
+- 26 Apr: GitHub catchup + SECOM exploration
