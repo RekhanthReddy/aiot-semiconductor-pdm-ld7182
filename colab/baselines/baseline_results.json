@@ -1,0 +1,10 @@
+{
+  "random_forest_optimal_threshold": 0.18000000000000005,
+  "xgboost_optimal_threshold": 0.05,
+  "mlp_optimal_threshold": 0.14,
+  "random_forest_f1": 0.34146341463414637,
+  "xgboost_f1": 0.3404255319148936,
+  "mlp_f1": 0.14814814814814814,
+  "test_set_size": 314,
+  "test_set_fails": 21
+}

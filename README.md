@@ -49,3 +49,8 @@ monitoring via Blynk.
 - 26 Apr: GitHub catchup + SECOM exploration
 - 30 Apr: SECOM preprocessing pipeline complete. 590 → 297 features.
   Imputer + scaler saved for downstream use.
+- 30 Apr: Baseline models trained (RF, XGBoost, MLP). Best baseline:
+  Random Forest with F1=0.342 at threshold 0.18. Threshold tuning
+  required because default 0.5 yields zero positive predictions on
+  SECOM's 93/7 imbalance. These baselines establish a lower bound
+  for the TinyML model to beat.
