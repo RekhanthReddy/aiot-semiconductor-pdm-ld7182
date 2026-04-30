@@ -35,7 +35,6 @@ monitoring via Blynk.
 **-**`/dataset` — SECOM data and preprocessing
 **-**`/references` — BibTeX references
 
-
 ## Project Resources
 
 - **Wokwi Simulation:** https://wokwi.com/projects/462262259358425089
@@ -48,3 +47,5 @@ monitoring via Blynk.
 - 24 Apr: Papers 3-4 (Njor, Hymel)
 - 25 Apr: Papers 5-7 (Susto, Achouch, Prakash) + Wokwi circuit complete
 - 26 Apr: GitHub catchup + SECOM exploration
+- 30 Apr: SECOM preprocessing pipeline complete. 590 → 297 features.
+  Imputer + scaler saved for downstream use.
