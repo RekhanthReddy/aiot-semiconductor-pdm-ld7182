@@ -1,0 +1,21 @@
+{
+  "model_type": "Random Forest",
+  "n_estimators": 200,
+  "max_depth": 10,
+  "n_features": 297,
+  "optimal_threshold": 0.18,
+  "test_metrics": {
+    "F1": 0.3415,
+    "AUC": 0.7444,
+    "recall": 0.3333,
+    "precision": 0.35
+  },
+  "test_set": {
+    "total": 314,
+    "fails": 21,
+    "passes": 293
+  },
+  "c_file": "rf_secom_FINAL.h",
+  "c_file_size_kb": 1594,
+  "esp32_flash_usage_pct": 39
+}

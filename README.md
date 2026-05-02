@@ -54,3 +54,7 @@ monitoring via Blynk.
   required because default 0.5 yields zero positive predictions on
   SECOM's 93/7 imbalance. These baselines establish a lower bound
   for the TinyML model to beat.
+- 2 May: Saturday TinyML day. Tested 3 NN architectures - all underperformed
+  RF baseline (best NN F1=0.21 vs RF 0.34). Pivoted to RF deployment via
+  emlearn. Final deployment artefact: 297-feature RF, inline C export
+  (1594 KB), 39% of ESP32 flash. Sunday: ESP32 deployment + Blynk integration.
