@@ -89,7 +89,7 @@ data collection and preprocessing. Hymel et al. (2023) report that digital
 signal processing, rather than inference, often dominates overall system
 latency on edge devices. Performing DSP in an efficient manner (i.e. using FFT
 and statistical feature extraction) plays an essential role in ensuring high
-model performance and low latency. The authors also discuss the benefit of
+model performance and low latency. The authors also discuss the benefit ofgit status
 MLOps platforms such as Edge Impulse for streamlining this end-to-end workflow.
 However, this project uses pure TensorFlow Lite Micro to ensure complete
 control over the preprocessing and quantization process.
