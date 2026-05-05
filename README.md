@@ -58,3 +58,5 @@ monitoring via Blynk.
   RF baseline (best NN F1=0.21 vs RF 0.34). Pivoted to RF deployment via
   emlearn. Final deployment artefact: 297-feature RF, inline C export
   (1594 KB), 39% of ESP32 flash. Sunday: ESP32 deployment + Blynk integration.
+- 5 May (Day 11): ML inference deployed and verified on ESP32. Diagnosed Sunday's int16 quantisation issue (z-score standardisation incompatible with emlearn's float-to-int16 cast). Fixed by retraining RF on min-max scaled features (range -30000 to +30000) for int16-safe quantisation. New model F1=0.36, AUC=0.74. Deployed via emlearn inline export (1542 KB). Tested in Wokwi (VS Code local compile, bypassing free-tier server queue). All 5 stored SECOM test samples (3 pass + 2 fail) predict correctly with predictions streaming to Blynk dashboard via virtual pins V6-V9. End-to-end AIoT pipeline complete: sensors → ESP32 (with on-device ML inference) → cloud dashboard.
+-
