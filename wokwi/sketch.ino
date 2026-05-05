@@ -1,11 +1,11 @@
 // ============================================
-// AIoT PdM Semiconductor — ESP32 + Blynk
+// AIoT PdM Semiconductor — ESP32 + Blynk + ML Inference
 // LD7182 — Rekhanth Reddy Obireddy
 // ============================================
 
 #define BLYNK_TEMPLATE_ID   "TMPL5A8UVc2sA"
 #define BLYNK_TEMPLATE_NAME "AIoT PdM Semiconductor"
-#define BLYNK_AUTH_TOKEN    "YOUR_AUTH_TOKEN_HERE" 
+#define BLYNK_AUTH_TOKEN    "YOUR_AUTH_TOKEN_HERE"
 
 #define BLYNK_PRINT Serial
 
@@ -18,13 +18,17 @@
 #include <DHT.h>
 #include <math.h>
 
-// Pin config (matches your existing wiring)
+// ML model and stored samples
+#include "rf_secom_int16safe.h"
+#include "secom_samples.h"
+
+// Pin config
 #define DHTPIN 4
 #define DHTTYPE DHT22
 #define RED_LED 18
 #define GREEN_LED 19
 
-// Wokwi WiFi (no real password needed for simulator)
+// Wokwi WiFi
 char ssid[] = "Wokwi-GUEST";
 char pass[] = "";
 
@@ -32,38 +36,37 @@ char pass[] = "";
 Adafruit_MPU6050 mpu;
 DHT dht(DHTPIN, DHTTYPE);
 
-// Blynk timer for periodic data sending
 BlynkTimer timer;
 
-// Fault detection thresholds
-const float ACCEL_THRESHOLD = 15.0;  // total acceleration m/s²
-const float TEMP_THRESHOLD = 40.0;   // °C
+// Threshold-based fault detection (sensor-side)
+const float ACCEL_THRESHOLD = 15.0;
+const float TEMP_THRESHOLD = 40.0;
 
+// ML inference state
+int current_sample_idx = 0;
+const float MODEL_THRESHOLD = 0.19;  // optimal threshold from training
+
+// Sensor data sender (existing functionality, every 2 sec)
 void sendSensorData() {
-  // Read MPU6050
   sensors_event_t a, g, temp_mpu;
   mpu.getEvent(&a, &g, &temp_mpu);
   
-  // Read DHT22
   float humidity = dht.readHumidity();
   float temperature = dht.readTemperature();
   
-  // Handle DHT NaN safely
   if (isnan(humidity) || isnan(temperature)) {
-    Serial.println("DHT22 read failed, using last good values");
+    Serial.println("DHT22 read failed");
     return;
   }
   
-  // Calculate total acceleration magnitude
   float total_accel = sqrt(a.acceleration.x * a.acceleration.x +
                            a.acceleration.y * a.acceleration.y +
                            a.acceleration.z * a.acceleration.z);
   
-  // Threshold-based fault detection (placeholder for ML model)
   bool fault = (total_accel > ACCEL_THRESHOLD) || (temperature > TEMP_THRESHOLD);
   int fault_status = fault ? 1 : 0;
   
-  // Send to Blynk dashboard
+  // Send sensor data to Blynk
   Blynk.virtualWrite(V0, a.acceleration.x);
   Blynk.virtualWrite(V1, a.acceleration.y);
   Blynk.virtualWrite(V2, a.acceleration.z);
@@ -71,58 +74,95 @@ void sendSensorData() {
   Blynk.virtualWrite(V4, humidity);
   Blynk.virtualWrite(V5, fault_status);
   
-  // Local LED + serial output
+  // LED indicator (sensor-side fault)
   if (fault) {
     digitalWrite(GREEN_LED, LOW);
     digitalWrite(RED_LED, HIGH);
-    Serial.println(">>> FAULT DETECTED <<<");
   } else {
     digitalWrite(GREEN_LED, HIGH);
     digitalWrite(RED_LED, LOW);
   }
-  
-  // Serial debug
-  Serial.print("Accel: ");
-  Serial.print(a.acceleration.x); Serial.print(", ");
-  Serial.print(a.acceleration.y); Serial.print(", ");
-  Serial.print(a.acceleration.z);
-  Serial.print(" | Temp: "); Serial.print(temperature);
-  Serial.print(" | Humid: "); Serial.print(humidity);
-  Serial.print(" | Fault: "); Serial.println(fault_status);
 }
 
+// ML inference cycle (every 5 sec, runs on stored SECOM samples)
+void runMLInference() {
+  Serial.println();
+  Serial.print("=== ML Inference: ");
+  Serial.print(SAMPLE_NAMES[current_sample_idx]);
+  Serial.println(" ===");
+  
+  const int16_t* sample = SAMPLES[current_sample_idx];
+  int actual_label = SAMPLE_LABELS[current_sample_idx];
+  
+  // Get probabilities from model (proba-based, allows custom threshold)
+  float probabilities[2];  // [prob_pass, prob_fail]
+  rf_secom_i16_predict_proba(sample, N_FEATURES, probabilities, 2);
+  
+  float prob_pass = probabilities[0];
+  float prob_fail = probabilities[1];
+  
+  // Apply our optimal threshold from training
+  int prediction = (prob_fail >= MODEL_THRESHOLD) ? 1 : 0;
+  
+  // Detailed serial output
+  Serial.print("Probabilities -> Pass: ");
+  Serial.print(prob_pass, 4);
+  Serial.print(" | Fail: ");
+  Serial.println(prob_fail, 4);
+  Serial.print("Threshold: ");
+  Serial.print(MODEL_THRESHOLD);
+  Serial.print(" | Predicted: ");
+  Serial.print(prediction);
+  Serial.print(" | Actual: ");
+  Serial.println(actual_label);
+  
+  bool correct = (prediction == actual_label);
+  Serial.print("Match: ");
+  Serial.println(correct ? "YES ✓" : "NO ✗");
+  
+  // Send to Blynk
+  Blynk.virtualWrite(V6, prediction);
+  Blynk.virtualWrite(V7, actual_label);
+  Blynk.virtualWrite(V8, current_sample_idx);
+  Blynk.virtualWrite(V9, correct ? 1 : 0);
+  
+  // Cycle to next sample
+  current_sample_idx = (current_sample_idx + 1) % NUM_SAMPLES;
+}
 void setup() {
   Serial.begin(115200);
   delay(500);
   
-  // Initialize LEDs
   pinMode(RED_LED, OUTPUT);
   pinMode(GREEN_LED, OUTPUT);
   digitalWrite(RED_LED, LOW);
   digitalWrite(GREEN_LED, LOW);
   
-  // Initialize MPU6050
+  // Initialize sensors
   if (!mpu.begin()) {
     Serial.println("MPU6050 not found!");
     while (1) delay(10);
   }
   Serial.println("MPU6050 ready");
   
-  // Initialize DHT22
   dht.begin();
   delay(2000);
   Serial.println("DHT22 ready");
   
-  // Connect to Blynk via Wokwi WiFi
+  // Connect to Blynk
   Serial.println("Connecting to Blynk...");
   Blynk.begin(BLYNK_AUTH_TOKEN, ssid, pass);
   
-  // Schedule sensor reads every 2 seconds
+  // Schedule both tasks
   timer.setInterval(2000L, sendSensorData);
+  timer.setInterval(5000L, runMLInference);
   
   Serial.println("=== System ready ===");
+  Serial.print("Stored ML samples: ");
+  Serial.println(NUM_SAMPLES);
+  Serial.print("Model threshold: ");
+  Serial.println(MODEL_THRESHOLD);
 }
-
 void loop() {
   Blynk.run();
   timer.run();
