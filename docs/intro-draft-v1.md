@@ -1,12 +1,15 @@
+
+
+## 1. Introduction 
+
 For manufacturing, wafer lines run at razor-thin profit margins, and one hiccup
 with equipment can lead to devastating loss in yield. Within specialized
 environments like High-Temperature Operating Life (HTOL) or post-silicon
 validation, an undetected fault doesn't just stall a single batch. It
 compromises months of reliability data and risks the delivery of silicon to
-global supply chains Each
-hour of fab downtime can cost tens of thousands of dollars, and legacy
+global supply chains. Each hour of fab downtime can cost tens of thousands of dollars, and legacy
 monitoring systems often cannot distinguish between signal noise and real
-hardware faults. As test data is high - dimensional today, traditional
+hardware faults. As test data is high-dimensional today, traditional
 maintenance techniques do not keep up with real-time fault detection.
 
 The Artificial Intelligence of Things (AIoT) brings sensing and intelligence
@@ -35,6 +38,6 @@ The remaining part of the report consists of 8 sections. Section 2 reviews the L
 defines the gap for the research, then followed by the architecture for the
 hardware and software in Section 3. The AI component is explained in Section 4,
 which defines the model, how it's trained and evaluated. Section 5 explains the
-implementation using wokwi and Blynk. Section 6 deals with Ethics, while Section
+implementation using Wokwi and Blynk. Section 6 deals with Ethics, while Section
 7 provides a critical reflection of the results. The final section 8 has the
 future work of the project.
