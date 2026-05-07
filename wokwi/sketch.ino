@@ -5,7 +5,7 @@
 
 #define BLYNK_TEMPLATE_ID   "TMPL5A8UVc2sA"
 #define BLYNK_TEMPLATE_NAME "AIoT PdM Semiconductor"
-#define BLYNK_AUTH_TOKEN    "YOUR_AUTH_TOKEN_HERE"
+#define BLYNK_AUTH_TOKEN    "Your Auth Token Here"
 
 #define BLYNK_PRINT Serial
 
@@ -18,9 +18,10 @@
 #include <DHT.h>
 #include <math.h>
 
-// ML model and stored samples
-#include "rf_secom_int16safe.h"
-#include "secom_samples.h"
+// ML model and stored samples — XGBoost variant (m2cgen export)
+#include "xgb_model.h"
+#include "secom_samples_xgb.h"
+
 
 // Pin config
 #define DHTPIN 4
@@ -44,7 +45,7 @@ const float TEMP_THRESHOLD = 40.0;
 
 // ML inference state
 int current_sample_idx = 0;
-const float MODEL_THRESHOLD = 0.19;  // optimal threshold from training
+const float MODEL_THRESHOLD = 0.07;  // optimal threshold for XGBoost (m2cgen export)
 
 // Sensor data sender (existing functionality, every 2 sec)
 void sendSensorData() {
@@ -87,21 +88,22 @@ void sendSensorData() {
 // ML inference cycle (every 5 sec, runs on stored SECOM samples)
 void runMLInference() {
   Serial.println();
-  Serial.print("=== ML Inference: ");
+  Serial.print("=== ML Inference (XGBoost): ");
   Serial.print(SAMPLE_NAMES[current_sample_idx]);
   Serial.println(" ===");
   
-  const int16_t* sample = SAMPLES[current_sample_idx];
+  // Get the current sample (now doubles, not int16_t)
+  const double* sample = SAMPLES[current_sample_idx];
   int actual_label = SAMPLE_LABELS[current_sample_idx];
   
-  // Get probabilities from model (proba-based, allows custom threshold)
-  float probabilities[2];  // [prob_pass, prob_fail]
-  rf_secom_i16_predict_proba(sample, N_FEATURES, probabilities, 2);
+  // m2cgen output uses doubles directly — no quantisation
+  double output[2];  // [prob_pass, prob_fail]
+  score((double*)sample, output);
   
-  float prob_pass = probabilities[0];
-  float prob_fail = probabilities[1];
+  double prob_pass = output[0];
+  double prob_fail = output[1];
   
-  // Apply our optimal threshold from training
+  // Apply optimal threshold
   int prediction = (prob_fail >= MODEL_THRESHOLD) ? 1 : 0;
   
   // Detailed serial output
