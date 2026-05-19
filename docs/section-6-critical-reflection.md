@@ -16,14 +16,14 @@ physical platform and with a wider variety of samples. All of these aspects
 serve as building blocks for the technical reflections discussed in the
 following subsections.
 
-
 ### 6.2 Engineering Lessons: The Deployment Toolchain Pivot
 
 The
-most significant engineering hurdle was a failure in the initial deployment
+most significant engineering problem was a failure in the initial deployment
 pipeline. Emlearn was chosen as it converted tree-based models efficiently, but
-the early testing showed that the Random Forest baseline was breaking
-completely-it predicted the majority 'pass' class for all inputs. The issue was
+the early testing showed that the Random Forest baseline was failed it predicted the majority 'pass' class for all inputs. 
+
+The issue was
 found by looking through the produced C code: an (int16_t) cast was applied to the
 inputs without an internal scaling factor in the toolchain. Since the inputs
 were Z-scored (around -3 to +3) nearly every feature was effectively becoming 0
@@ -53,7 +53,6 @@ high recall (0.524) is often preferable to high precision to minimise the
 probability that catastrophic failures occur without detection. The AUC of 0.76
 indicates meaningful class separability and provides an adequate basis for
 risk-informed decision-making at the edge.
-
 
 ### 6.4 Ethical Considerations
 
